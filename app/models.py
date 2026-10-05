@@ -22,7 +22,23 @@ class Topic(str, Enum):
     ROADS = "ROADS"
     WASTE = "WASTE"
     PLANNING = "PLANNING"
+    PARKS = "PARKS"
     OTHER = "OTHER"
+
+
+# Secība pēc līguma: OTHER vienmēr beigās.
+TOPIC_NAMES = {
+    Topic.ROADS: "Ceļi un ielas",
+    Topic.WASTE: "Atkritumi",
+    Topic.PLANNING: "Teritorijas plānošana",
+    Topic.PARKS: "Parki un skvēri",
+    Topic.OTHER: "Cits",
+}
+
+
+class TopicItem(BaseModel):
+    code: Topic
+    name: str
 
 
 class SubmissionStatus(str, Enum):
