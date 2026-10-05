@@ -1,9 +1,28 @@
 """Datu modeļi pēc API līguma (API contract) docs/openapi.yaml."""
 
+import re
 from datetime import date, datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import BaseModel
+from pydantic import AfterValidator, BaseModel
+from pydantic_core import PydanticCustomError
+
+# CR-1: tikai formāts. 11 cipari vai DDMMYY-NNNNN.
+_PERSONAL_CODE_FORMAT = re.compile(r"\d{6}-?\d{5}")
+
+
+def _normalise_personal_code(value: str) -> str:
+    # Kļūdas ziņojumā ievadīto kodu neatkārtojam.
+    value = value.strip()
+    if not value:
+        raise PydanticCustomError("missing", "Field required")
+    if not _PERSONAL_CODE_FORMAT.fullmatch(value):
+        raise PydanticCustomError("personal_code_format", "Invalid personal code")
+    return value.replace("-", "")
+
+
+PersonalCode = Annotated[str, AfterValidator(_normalise_personal_code)]
 
 
 class PreferredChannel(str, Enum):
@@ -50,7 +69,7 @@ class SubmissionStatus(str, Enum):
 
 
 class SubmissionCreate(BaseModel):
-    personalCode: str
+    personalCode: PersonalCode
     fullName: str
     email: str  # TODO: pārbaudīt e-pasta formātu
     preferredChannel: PreferredChannel
