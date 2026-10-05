@@ -11,7 +11,7 @@ help: ## Parāda komandas
 	@awk -F ':.*## ' '/^[a-zA-Z_%-]+:.*## / {printf "  make %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 run: ## Palaiž lietotni (ports 8000: /ui un /docs)
-	python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+	ALLOW_TEST_PERSONAL_CODES=true python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 mock: ## Palaiž OMD reģistra imitāciju (ports 8001)
 	python -m uvicorn mock_omd.main:app --host 0.0.0.0 --port 8001

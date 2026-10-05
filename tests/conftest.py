@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app import storage
+from app import config, storage
 from app.main import app, get_omd
 
 
@@ -15,6 +15,12 @@ class FakeOmd:
     def __call__(self, personal_code: str) -> str | None:
         self.calls.append(personal_code)
         return self.statuses.get(personal_code, "NOT_ACTIVATED")
+
+
+@pytest.fixture(autouse=True)
+def allow_test_personal_codes(monkeypatch):
+    # Esošie sintētiskie kodi neiztur kontrolciparu (CR-1 izņēmums).
+    monkeypatch.setattr(config, "ALLOW_TEST_PERSONAL_CODES", True)
 
 
 @pytest.fixture

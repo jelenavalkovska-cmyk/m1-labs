@@ -2,8 +2,14 @@
 
 from datetime import date, datetime
 from enum import Enum
+from typing import Annotated
 
-from pydantic import BaseModel
+from pydantic import AfterValidator, BaseModel
+
+from app import personal_code
+
+# Pārbauda un normalizē tikai ievadi (CR-1).
+PersonalCode = Annotated[str, AfterValidator(personal_code.validate)]
 
 
 class PreferredChannel(str, Enum):
@@ -34,7 +40,7 @@ class SubmissionStatus(str, Enum):
 
 
 class SubmissionCreate(BaseModel):
-    personalCode: str
+    personalCode: PersonalCode
     fullName: str
     email: str  # TODO: pārbaudīt e-pasta formātu
     preferredChannel: PreferredChannel
@@ -53,7 +59,8 @@ class SubmissionCreated(BaseModel):
 
 
 class Submission(SubmissionCreated, SubmissionCreate):
-    pass
+    # Saglabātos kodus atkārtoti nepārbauda.
+    personalCode: str
 
 
 class Health(BaseModel):
